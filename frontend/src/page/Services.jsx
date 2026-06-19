@@ -1,9 +1,12 @@
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import {
   Heart, Star, Shield, Clock, Award,
-  CheckCircle, Crown, ChevronDown, ChevronUp, Zap, Eye, Droplets, Sparkles
+  CheckCircle, Crown, ChevronDown, ChevronUp, Zap, Eye, Droplets, Sparkles,
+  CalendarCheck,
 } from "lucide-react";
 
 const fadeUp = {
@@ -12,6 +15,8 @@ const fadeUp = {
 };
 
 // ─── DATA ───────────────────────────────────────────────────────────────────
+// NOTE: these names are kept IDENTICAL to the optgroup labels/options used in
+// Contact.jsx's SERVICE_GROUPS so the dropdown there matches automatically.
 
 const menServices = [
   { name: "Hair Cut Basic", price: 300 },
@@ -69,12 +74,12 @@ const facialServices = [
   { name: "24K Gold Facial", price: 2400 },
   { name: "Hydra Facial", price: 5000 },
   { name: "O3+", price: 3000 },
-  { name: "Bleach & Detan — Face", price: 400 },
-  { name: "Bleach & Detan — Neck", price: 150 },
-  { name: "Bleach & Detan — Underarms", price: 250 },
-  { name: "Bleach & Detan — Full Arms", price: 500 },
-  { name: "Bleach & Detan — Full Legs", price: 700 },
-  { name: "Bleach & Detan — Full Body", price: 3000 },
+  { name: "Bleach & Detan (Face)", price: 400 },
+  { name: "Bleach & Detan (Neck)", price: 150 },
+  { name: "Bleach & Detan (Underarms)", price: 250 },
+  { name: "Bleach & Detan (Full Arms)", price: 500 },
+  { name: "Bleach & Detan (Full Legs)", price: 700 },
+  { name: "Bleach & Detan (Full Body)", price: 3000 },
 ];
 
 const bridalServices = [
@@ -95,20 +100,20 @@ const bridalServices = [
 ];
 
 const waxingServices = [
-  { name: "Threading — Eyebrow", price: 40 },
-  { name: "Threading — Upper Lip", price: 40 },
-  { name: "Threading — Chin", price: 50 },
-  { name: "Threading — Full Face", price: 200 },
-  { name: "Waxing (Regular) — Half Arms", price: 200 },
-  { name: "Waxing (Regular) — Full Arms", price: 300 },
-  { name: "Waxing (Regular) — Half Legs", price: 300 },
-  { name: "Waxing (Regular) — Full Legs", price: 400 },
-  { name: "Waxing (Regular) — Full Body", price: 1500 },
-  { name: "Flavoured Wax — Half Arms", price: 400 },
-  { name: "Flavoured Wax — Full Arms", price: 500 },
-  { name: "Flavoured Wax — Half Legs", price: 500 },
-  { name: "Flavoured Wax — Full Legs", price: 700 },
-  { name: "Flavoured Wax — Full Body", price: 2500 },
+  { name: "Threading - Eyebrow", price: 40 },
+  { name: "Threading - Upper Lip", price: 40 },
+  { name: "Threading - Chin", price: 50 },
+  { name: "Threading - Full Face", price: 200 },
+  { name: "Waxing (Regular) - Half Arms", price: 200 },
+  { name: "Waxing (Regular) - Full Arms", price: 300 },
+  { name: "Waxing (Regular) - Half Legs", price: 300 },
+  { name: "Waxing (Regular) - Full Legs", price: 400 },
+  { name: "Waxing (Regular) - Full Body", price: 1500 },
+  { name: "Flavoured Wax - Half Arms", price: 400 },
+  { name: "Flavoured Wax - Full Arms", price: 500 },
+  { name: "Flavoured Wax - Half Legs", price: 500 },
+  { name: "Flavoured Wax - Full Legs", price: 700 },
+  { name: "Flavoured Wax - Full Body", price: 2500 },
 ];
 
 const unisexServices = [
@@ -122,9 +127,9 @@ const unisexServices = [
   { name: "Regular Manicure & Pedicure", price: 300 },
   { name: "Rose Manicure & Pedicure", price: 700 },
   { name: "Chocolate Manicure & Pedicure", price: 600 },
-  { name: "Relaxing Massage — Hand (15 min)", price: 250 },
-  { name: "Relaxing Massage — Feet (20 min)", price: 350 },
-  { name: "Relaxing Massage — Back & Neck", price: 400 },
+  { name: "Relaxing Massage - Hand (15 min)", price: 250 },
+  { name: "Relaxing Massage - Feet (20 min)", price: 350 },
+  { name: "Relaxing Massage - Back & Neck", price: 400 },
 ];
 
 const menCombos = [
@@ -208,6 +213,45 @@ const whyChoosePoints = [
   },
 ];
 
+// Flat list used to build JSON-LD structured data
+const ALL_SERVICES_FOR_SEO = [
+  ...menServices, ...womenServices, ...hairSpaServices, ...facialServices,
+  ...bridalServices, ...waxingServices, ...unisexServices,
+];
+
+// ─── BOOK NOW BUTTON ────────────────────────────────────────────────────────
+
+function BookNowButton({ service, price, size = "sm" }) {
+  const navigate = useNavigate();
+
+  const handleBook = (e) => {
+    e.stopPropagation();
+    navigate("/contact", { state: { service, price } });
+  };
+
+  if (size === "sm") {
+    return (
+      <button
+        onClick={handleBook}
+        className="shrink-0 inline-flex items-center gap-1.5 text-[10px] tracking-wider uppercase font-semibold text-[#8B5A2B] border border-[#C8A96E]/50 rounded-full px-3 py-1.5 hover:bg-[#C8A96E] hover:text-white hover:border-[#C8A96E] transition-all duration-200 ml-3"
+      >
+        <CalendarCheck size={12} />
+        Book Now
+      </button>
+    );
+  }
+
+  return (
+    <button
+      onClick={handleBook}
+      className="w-full mt-2 inline-flex items-center justify-center gap-2 text-xs tracking-widest uppercase font-semibold text-white bg-gradient-to-r from-[#C8A96E] to-[#8B5A2B] rounded-full py-2.5 hover:shadow-md hover:scale-[1.02] transition-all duration-300"
+    >
+      <CalendarCheck size={14} />
+      Book Now
+    </button>
+  );
+}
+
 // ─── COMPONENTS ─────────────────────────────────────────────────────────────
 
 function ServiceRow({ name, price, index }) {
@@ -221,7 +265,10 @@ function ServiceRow({ name, price, index }) {
       className="flex items-center justify-between px-5 py-3.5 border-b border-[#E8D9C0] hover:bg-[#F5EFE6] transition-colors duration-200 group"
     >
       <span className="text-[#5A4535] text-sm group-hover:text-[#2C1810] transition-colors">{name}</span>
-      <span className="text-[#8B5A2B] font-semibold text-sm ml-4 shrink-0">₹{price.toLocaleString("en-IN")}</span>
+      <div className="flex items-center shrink-0 ml-4">
+        <span className="text-[#8B5A2B] font-semibold text-sm">₹{price.toLocaleString("en-IN")}</span>
+        <BookNowButton service={name} price={price} />
+      </div>
     </motion.div>
   );
 }
@@ -291,7 +338,8 @@ function ComboCard({ combo, index }) {
           </li>
         ))}
       </ul>
-      <p className="text-[#9A7A60] text-xs italic leading-relaxed">{combo.desc}</p>
+      <p className="text-[#9A7A60] text-xs italic leading-relaxed mb-1">{combo.desc}</p>
+      <BookNowButton service={combo.name} price={combo.price} size="lg" />
     </motion.div>
   );
 }
@@ -350,11 +398,94 @@ function PremiumBanner() {
   );
 }
 
+// ─── SEO ────────────────────────────────────────────────────────────────────
+
+function ServicesSEO() {
+  const SITE_URL = "https://www.velvetluxurysalon.com"; // update to your real domain
+  const pageUrl = `${SITE_URL}/services`;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BeautySalon",
+    "name": "Velvet Premium Unisex Salon",
+    "image": `${SITE_URL}/og-image.jpg`,
+    "url": SITE_URL,
+    "telephone": "+919345678646",
+    "priceRange": "₹₹",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Opposite to ICICI bank, KK Nagar, Kalingarayanpalayam",
+      "addressLocality": "Bhavani, Erode",
+      "addressRegion": "Tamil Nadu",
+      "addressCountry": "IN",
+    },
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Salon Services",
+      "itemListElement": ALL_SERVICES_FOR_SEO.map((s) => ({
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": s.name,
+        },
+        "price": s.price,
+        "priceCurrency": "INR",
+      })),
+    },
+  };
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": SITE_URL },
+      { "@type": "ListItem", "position": 2, "name": "Services", "item": pageUrl },
+    ],
+  };
+
+  return (
+    <Helmet>
+      <title>Salon Services & Price List | Velvet Premium Unisex Salon, Bhavani Erode</title>
+      <meta
+        name="description"
+        content="Explore Velvet Premium Unisex Salon's full price list — haircuts, colouring, hair spa, facials, waxing, bridal makeup & signature combos in Bhavani, Erode. Book your appointment in seconds."
+      />
+      <meta
+        name="keywords"
+        content="unisex salon Erode, salon price list Bhavani, hair spa Erode, bridal makeup Bhavani, hair colouring salon, facial spa Erode, Velvet salon services"
+      />
+      <link rel="canonical" href={pageUrl} />
+
+      {/* Open Graph */}
+      <meta property="og:type" content="website" />
+      <meta property="og:title" content="Salon Services & Price List | Velvet Premium Unisex Salon" />
+      <meta
+        property="og:description"
+        content="Full service menu with transparent pricing — haircuts, colour, hair spa, facials, waxing, bridal packages & combos."
+      />
+      <meta property="og:url" content={pageUrl} />
+      <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
+
+      {/* Twitter */}
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content="Salon Services & Price List | Velvet Premium Unisex Salon" />
+      <meta
+        name="twitter:description"
+        content="Explore our full menu of grooming, hair, skin and bridal services with transparent pricing."
+      />
+
+      <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+      <script type="application/ld+json">{JSON.stringify(breadcrumbLd)}</script>
+    </Helmet>
+  );
+}
+
 // ─── MAIN PAGE ───────────────────────────────────────────────────────────────
 
 export default function Services() {
   return (
     <div className="min-h-screen bg-[#FAF7F2] pt-20">
+      <ServicesSEO />
 
       {/* Hero */}
       <section className="py-16 md:py-24 px-6 text-center">

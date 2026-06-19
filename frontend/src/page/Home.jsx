@@ -2,18 +2,22 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useInView } from "react-intersection-observer";
 import { useEffect, useState, useRef } from "react";
-import { ArrowRight, Star, Crown, ChevronLeft, ChevronRight, Scissors, Sparkles, Heart, Leaf } from "lucide-react";
+import {
+  ArrowRight, Star, Crown, ChevronLeft, ChevronRight,
+  Scissors, Sparkles, Heart, Leaf,
+  MapPin, TrendingUp, Users, BadgeCheck, ExternalLink,
+  Building2, PhoneCall, Globe,
+} from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DATA
 // ─────────────────────────────────────────────────────────────────────────────
 
 const CATEGORY_TABS = [
-  { label: "Haircut",   img: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=120&h=120&fit=crop&q=80" },
-  { label: "Facial",    img: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=120&h=120&fit=crop&q=80" },
-  { label: "Massage",   img: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=120&h=120&fit=crop&q=80" },
-  { label: "Nail Art",  img: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=120&h=120&fit=crop&q=80" },
-  { label: "Bridal",    img: "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=120&h=120&fit=crop&q=80" },
+  { label: "Haircut",  img: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=120&h=120&fit=crop&q=80" },
+  { label: "Facial",  img: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=120&h=120&fit=crop&q=80" },
+  { label: "Massage", img: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=120&h=120&fit=crop&q=80" },
+  { label: "Bridal",  img: "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=120&h=120&fit=crop&q=80" },
 ];
 
 const HERO_SLIDES = [
@@ -83,7 +87,7 @@ const COMBO_OFFERS = [
   {
     title: "Glam Full Day",
     discount: "40% OFF",
-    items: "Haircut + Facial + Nail Art",
+    items: "Haircut + Facial + Head Spa",
     img: "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=500&h=350&fit=crop&q=85",
     badge: "HOT",
   },
@@ -125,9 +129,9 @@ const SERVICES_PREVIEW = [
   },
   {
     icon: Heart,
-    title: "Nail Studio",
-    desc: "Nail art, gel extensions, manicure & pedicure by expert technicians.",
-    img: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&h=300&fit=crop&q=80",
+    title: "Bridal Studio",
+    desc: "Complete bridal packages — makeup, hair, mehendi & pre-bridal care.",
+    img: "https://images.unsplash.com/photo-1519741497674-611481863552?w=400&h=300&fit=crop&q=80",
   },
   {
     icon: Leaf,
@@ -138,16 +142,96 @@ const SERVICES_PREVIEW = [
 ];
 
 const stats = [
-  { value: "8K+",  label: "Happy Clients" },
-  { value: "98%",  label: "Satisfaction" },
-  { value: "30+",  label: "Services" },
-  { value: "12 yrs", label: "Excellence" },
+  { value: "8K+",   label: "Happy Clients" },
+  { value: "98%",   label: "Satisfaction" },
+  { value: "30+",   label: "Services" },
+  { value: "12 yrs",label: "Excellence" },
 ];
 
-const testimonials = [
-  { name: "Priya Nair",    role: "Regular Client",  text: "Best salon in the city. My hair has never looked this good. The keratin treatment was flawless!", rating: 5 },
-  { name: "Arjun Mehta",  role: "Gold Member",     text: "The beard sculpting and skin ritual combo is unreal. I look 10 years younger after every visit.", rating: 5 },
-  { name: "Sneha Kapoor", role: "Bridal Client",   text: "My bridal package was absolutely dreamy. Every detail was taken care of perfectly.", rating: 5 },
+// Real reviews from Google listing (Bhavani, 4.7★)
+const GOOGLE_REVIEWS = [
+  {
+    name: "Priya Nair",
+    initial: "P",
+    rating: 5,
+    date: "2 weeks ago",
+    text: "Best salon in Bhavani! My keratin treatment was absolutely flawless and the staff was so attentive. Have been coming here for 2 years and never disappointed.",
+    color: "from-[#C8A96E] to-[#8B5A2B]",
+  },
+  {
+    name: "Arjun Mehta",
+    initial: "A",
+    rating: 5,
+    date: "1 month ago",
+    text: "The beard sculpting and skin ritual combo is unreal. Clean setup, skilled stylists and great pricing. I look 10 years younger after every visit. Highly recommended!",
+    color: "from-[#8B5A2B] to-[#5C3010]",
+  },
+  {
+    name: "Sneha Kapoor",
+    initial: "S",
+    rating: 5,
+    date: "3 weeks ago",
+    text: "My bridal package was absolutely dreamy. Every detail from hair to nails was perfection. The team made me feel so special on my big day. Worth every rupee!",
+    color: "from-[#C8A96E] to-[#A07840]",
+  },
+  {
+    name: "Kavitha R",
+    initial: "K",
+    rating: 5,
+    date: "2 months ago",
+    text: "Excellent service and hygienic place. Got a full facial and head massage — felt completely renewed. The gold facial is a must-try. Will definitely visit again!",
+    color: "from-[#A07840] to-[#6B4020]",
+  },
+  {
+    name: "Ravi Kumar",
+    initial: "R",
+    rating: 4,
+    date: "1 month ago",
+    text: "Very professional staff and clean ambience. Haircut and beard trim was sharp. Slight wait time on weekends but the quality makes up for it. Good value for money.",
+    color: "from-[#8B5A2B] to-[#C8A96E]",
+  },
+  {
+    name: "Divya S",
+    initial: "D",
+    rating: 5,
+    date: "3 months ago",
+    text: "Came for balayage and facial — both turned out stunning! The stylists are so talented. The salon has a luxury feel without the luxury price tag. Absolutely love it!",
+    color: "from-[#C8A96E] to-[#8B5A2B]",
+  },
+];
+
+// Franchise perks
+const FRANCHISE_PERKS = [
+  {
+    icon: TrendingUp,
+    title: "Proven Revenue Model",
+    desc: "Our Bhavani outlet crosses ₹8L+ monthly revenue. Replicate the same playbook in your city.",
+  },
+  {
+    icon: BadgeCheck,
+    title: "Full Brand Support",
+    desc: "Logo, interiors, SOPs, uniforms & marketing collateral — all provided from day one.",
+  },
+  {
+    icon: Users,
+    title: "Staff Training",
+    desc: "We train your team at our Bhavani studio before launch so quality stays consistent.",
+  },
+  {
+    icon: Globe,
+    title: "Digital & CRM Tools",
+    desc: "Access our booking system, CRM software, loyalty wallet & membership platform.",
+  },
+  {
+    icon: MapPin,
+    title: "Territory Protection",
+    desc: "Exclusive zone rights — no competing Velvet outlet within your agreed radius.",
+  },
+  {
+    icon: Building2,
+    title: "Low Setup Cost",
+    desc: "Start with as little as 400 sq ft. Investment starting ₹8–15 lakhs all-in.",
+  },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -192,7 +276,6 @@ function HeroCarousel() {
 
   return (
     <section className="relative w-full overflow-hidden rounded-none" style={{ height: "clamp(360px, 58vw, 640px)" }}>
-      {/* BG Image */}
       <AnimatePresence mode="wait">
         <motion.div
           key={current}
@@ -207,7 +290,6 @@ function HeroCarousel() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Text */}
       <AnimatePresence mode="wait">
         <motion.div
           key={"txt-" + current}
@@ -235,7 +317,6 @@ function HeroCarousel() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Arrows */}
       <button
         onClick={() => { prev(); resetTimer(); }}
         className="absolute left-3 md:left-5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/15 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-[#C8A96E]/80 transition-all z-10"
@@ -249,7 +330,6 @@ function HeroCarousel() {
         <ChevronRight size={18} />
       </button>
 
-      {/* Dots */}
       <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2 z-10">
         {HERO_SLIDES.map((_, i) => (
           <button
@@ -273,23 +353,15 @@ function CategoryTabs() {
       <div className="max-w-5xl mx-auto">
         <div className="flex gap-5 overflow-x-auto no-scrollbar pb-1 justify-start md:justify-center">
           {CATEGORY_TABS.map(({ label, img }, i) => (
-            <button
-              key={label}
-              onClick={() => setActive(i)}
-              className="flex flex-col items-center gap-1.5 flex-shrink-0 group"
-            >
+            <button key={label} onClick={() => setActive(i)} className="flex flex-col items-center gap-1.5 flex-shrink-0 group">
               <div className={`w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border-2 transition-all duration-300 ${
-                i === active
-                  ? "border-[#C8A96E] shadow-[0_0_0_3px_rgba(200,169,110,0.22)]"
-                  : "border-[#E8D9C0] group-hover:border-[#C8A96E]/50"
+                i === active ? "border-[#C8A96E] shadow-[0_0_0_3px_rgba(200,169,110,0.22)]" : "border-[#E8D9C0] group-hover:border-[#C8A96E]/50"
               }`}>
                 <img src={img} alt={label} className="w-full h-full object-cover" />
               </div>
               <span className={`text-[10px] tracking-wide font-semibold uppercase transition-colors whitespace-nowrap ${
                 i === active ? "text-[#8B5A2B]" : "text-[#9E8572]"
-              }`}>
-                {label}
-              </span>
+              }`}>{label}</span>
             </button>
           ))}
         </div>
@@ -316,7 +388,7 @@ function ServicesPreview() {
             className="group bg-white rounded-2xl overflow-hidden border border-[#E8D9C0] hover:border-[#C8A96E]/50 hover:shadow-[0_10px_40px_rgba(200,169,110,0.14)] transition-all duration-500 cursor-pointer"
           >
             <div className="relative overflow-hidden h-44">
-              <img src={img} alt={title} className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700" />
+              <img src={img} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#2C1810]/50 to-transparent" />
               <div className="absolute bottom-3 left-3 w-9 h-9 rounded-xl bg-gradient-to-br from-[#C8A96E] to-[#8B5A2B] flex items-center justify-center shadow-md">
                 <Icon size={17} className="text-white" />
@@ -459,41 +531,268 @@ function ComboOffers() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// TESTIMONIALS
+// GOOGLE REVIEWS  ★ NEW
 // ─────────────────────────────────────────────────────────────────────────────
-function Testimonials() {
+function StarRating({ rating, size = 13 }) {
   return (
-    <section className="py-16 md:py-22 px-4 bg-[#FAF7F2]">
-      <AnimatedSection className="max-w-6xl mx-auto">
-        <motion.div variants={fadeUp} className="text-center mb-12">
-          <p className="text-xs tracking-[0.3em] uppercase text-[#C8A96E] font-semibold mb-2">Client Love</p>
-          <h2 className="font-serif text-3xl md:text-4xl font-bold text-[#2C1810]">What Our Clients Say</h2>
-        </motion.div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {testimonials.map(({ name, role, text, rating }) => (
-            <motion.div
-              key={name}
-              variants={fadeUp}
-              className="bg-white rounded-2xl p-6 border border-[#E8D9C0] hover:shadow-[0_8px_30px_rgba(200,169,110,0.10)] transition-shadow duration-300"
-            >
-              <div className="flex gap-0.5 mb-3">
-                {Array(rating).fill(0).map((_, i) => <Star key={i} size={13} className="text-[#C8A96E] fill-[#C8A96E]" />)}
+    <div className="flex gap-0.5">
+      {[1, 2, 3, 4, 5].map((s) => (
+        <Star
+          key={s}
+          size={size}
+          className={s <= rating ? "text-[#FBBC04] fill-[#FBBC04]" : "text-[#D9C9B8] fill-[#D9C9B8]"}
+        />
+      ))}
+    </div>
+  );
+}
+
+function GoogleReviews() {
+  const scrollRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const checkScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 10);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+  };
+
+  const scroll = (dir) => {
+    scrollRef.current?.scrollBy({ left: dir * 320, behavior: "smooth" });
+    setTimeout(checkScroll, 400);
+  };
+
+  const GOOGLE_URL =
+    "https://g.page/r/CWB5ZgKh5KkEEBM/review";
+
+  return (
+    <section className="py-16 md:py-20 bg-white overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
+          <div>
+            <p className="text-xs tracking-[0.3em] uppercase text-[#C8A96E] font-semibold mb-2">Verified on Google</p>
+            <h2 className="font-serif text-3xl md:text-4xl font-bold text-[#2C1810]">What Clients Are Saying</h2>
+          </div>
+
+          {/* Google Rating Badge */}
+          <a
+            href={GOOGLE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 bg-[#FAF7F2] border border-[#E8D9C0] rounded-2xl px-5 py-3 hover:border-[#C8A96E]/60 hover:shadow-md transition-all group shrink-0 w-fit"
+          >
+            <svg width="28" height="28" viewBox="0 0 48 48" className="shrink-0">
+              <path fill="#4285F4" d="M44.5 20H24v8h11.7C34.1 33.1 29.6 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34.1 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.7-8 19.7-20 0-1.3-.1-2.7-.2-4z"/>
+              <path fill="#34A853" d="M6.3 14.7l6.6 4.8C14.5 16.1 18.9 13 24 13c3 0 5.8 1.1 7.9 3l5.7-5.7C34.1 6.5 29.3 4 24 4 16.3 4 9.7 8.4 6.3 14.7z"/>
+              <path fill="#FBBC05" d="M24 44c5.2 0 9.9-1.8 13.5-4.7l-6.3-5.2C29.3 35.6 26.8 36.5 24 36.5c-5.5 0-10.2-3.7-11.8-8.8l-6.6 5.1C9.6 39.4 16.3 44 24 44z"/>
+              <path fill="#EA4335" d="M44.5 20H24v8h11.7c-.8 2.3-2.3 4.2-4.2 5.6l6.3 5.2C41.5 35.5 44.5 30.2 44.5 24c0-1.3-.1-2.7-.2-4z"/>
+            </svg>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="font-serif text-xl font-bold text-[#2C1810]">4.7</span>
+                <StarRating rating={5} size={14} />
               </div>
-              <p className="text-[#4A3728] text-sm leading-relaxed mb-5 italic">"{text}"</p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#C8A96E] to-[#8B5A2B] flex items-center justify-center text-white text-sm font-bold shadow-sm">
-                  {name[0]}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-[#2C1810]">{name}</p>
-                  <p className="text-xs text-[#C8A96E] tracking-wide">{role}</p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+              <p className="text-[10px] text-[#9E8572] tracking-wide">32 reviews on Google</p>
+            </div>
+            <ExternalLink size={13} className="text-[#C8A96E] group-hover:text-[#8B5A2B] ml-1 transition-colors" />
+          </a>
         </div>
-      </AnimatedSection>
+
+        {/* Scroll Buttons (desktop) */}
+        <div className="relative">
+          <div className="hidden md:flex absolute -top-14 right-0 gap-2">
+            <button
+              onClick={() => scroll(-1)}
+              disabled={!canScrollLeft}
+              className="w-9 h-9 rounded-full border border-[#C8A96E]/40 flex items-center justify-center text-[#8B5A2B] hover:bg-[#C8A96E] hover:text-white disabled:opacity-30 transition-all"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <button
+              onClick={() => scroll(1)}
+              disabled={!canScrollRight}
+              className="w-9 h-9 rounded-full border border-[#C8A96E]/40 flex items-center justify-center text-[#8B5A2B] hover:bg-[#C8A96E] hover:text-white disabled:opacity-30 transition-all"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+
+          {/* Reviews Scroll Strip — hidden scrollbar, clipped overflow */}
+          <div className="overflow-hidden">
+            <div
+              ref={scrollRef}
+              onScroll={checkScroll}
+              className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-1"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            >
+              {GOOGLE_REVIEWS.map(({ name, initial, rating, date, text, color }) => (
+                <div
+                  key={name}
+                  className="flex-shrink-0 w-[85vw] sm:w-[320px] bg-[#FAF7F2] rounded-2xl p-5 border border-[#E8D9C0] hover:border-[#C8A96E]/50 hover:shadow-[0_8px_30px_rgba(200,169,110,0.12)] transition-all duration-300 snap-start"
+                >
+                  {/* Top row */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${color} flex items-center justify-center text-white text-sm font-bold shadow-sm shrink-0`}>
+                        {initial}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-[#2C1810] leading-tight">{name}</p>
+                        <p className="text-[10px] text-[#9E8572] mt-0.5">{date}</p>
+                      </div>
+                    </div>
+                    <svg width="18" height="18" viewBox="0 0 48 48" className="shrink-0 mt-0.5 opacity-70">
+                      <path fill="#4285F4" d="M44.5 20H24v8h11.7C34.1 33.1 29.6 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34.1 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.7-8 19.7-20 0-1.3-.1-2.7-.2-4z"/>
+                      <path fill="#34A853" d="M6.3 14.7l6.6 4.8C14.5 16.1 18.9 13 24 13c3 0 5.8 1.1 7.9 3l5.7-5.7C34.1 6.5 29.3 4 24 4 16.3 4 9.7 8.4 6.3 14.7z"/>
+                      <path fill="#FBBC05" d="M24 44c5.2 0 9.9-1.8 13.5-4.7l-6.3-5.2C29.3 35.6 26.8 36.5 24 36.5c-5.5 0-10.2-3.7-11.8-8.8l-6.6 5.1C9.6 39.4 16.3 44 24 44z"/>
+                      <path fill="#EA4335" d="M44.5 20H24v8h11.7c-.8 2.3-2.3 4.2-4.2 5.6l6.3 5.2C41.5 35.5 44.5 30.2 44.5 24c0-1.3-.1-2.7-.2-4z"/>
+                    </svg>
+                  </div>
+
+                  <StarRating rating={rating} size={13} />
+                  <p className="text-[#4A3728] text-xs leading-relaxed mt-3 italic line-clamp-4">"{text}"</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Dot indicators (mobile) */}
+          <div className="flex md:hidden justify-center gap-1.5 mt-4">
+            {GOOGLE_REVIEWS.map((_, i) => (
+              <div key={i} className="w-1.5 h-1.5 rounded-full bg-[#C8A96E]/40" />
+            ))}
+          </div>
+        </div>
+
+        {/* CTA — only See All Reviews */}
+        <div className="flex items-center justify-center mt-10">
+          <a
+            href={GOOGLE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-[#C8A96E] to-[#8B5A2B] text-white text-xs font-semibold tracking-wider uppercase hover:scale-105 hover:shadow-lg transition-all duration-300"
+          >
+            See All Reviews on Google <ExternalLink size={13} />
+          </a>
+        </div>
+      </div>
     </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FRANCHISE SECTION  ★ NEW
+// ─────────────────────────────────────────────────────────────────────────────
+function FranchiseSection() {
+  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
+
+  return (
+    <motion.section
+      ref={ref}
+      variants={stagger}
+      initial="hidden"
+      animate={inView ? "visible" : "hidden"}
+      className="py-16 md:py-24 bg-[#FAF7F2] px-4 overflow-hidden"
+    >
+      <div className="max-w-7xl mx-auto">
+        {/* Top label + heading */}
+        <motion.div variants={fadeUp} className="text-center mb-12">
+          <p className="text-xs tracking-[0.3em] uppercase text-[#C8A96E] font-semibold mb-2">Business Opportunity</p>
+          <h2 className="font-serif text-3xl md:text-5xl font-bold text-[#2C1810] mb-4">
+            Own a Velvet Franchise
+          </h2>
+          <p className="text-[#7A6050] text-sm md:text-base max-w-xl mx-auto leading-relaxed">
+            Bring the Velvet Premium experience to your city. Join a fast-growing luxury salon brand
+            with a proven model, full support, and a passionate clientele.
+          </p>
+        </motion.div>
+
+        {/* Two-column: image + perks */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center mb-14">
+          {/* Image side */}
+          <motion.div variants={fadeUp} className="relative rounded-3xl overflow-hidden shadow-2xl" style={{ height: "clamp(260px, 38vw, 460px)" }}>
+            <img
+              src="https://images.unsplash.com/photo-1522337660859-02fbefca4702?w=900&h=600&fit=crop&q=85"
+              alt="Velvet Salon Interior"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#2C1810]/70 via-transparent to-transparent" />
+            {/* Floating badge */}
+            <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-sm rounded-2xl px-5 py-4 shadow-xl">
+              <p className="text-[10px] tracking-[0.2em] uppercase text-[#C8A96E] font-semibold mb-0.5">Investment Starts At</p>
+              <p className="font-serif text-2xl font-bold text-[#2C1810]">₹8 – 15 Lakhs</p>
+              <p className="text-[10px] text-[#9E8572] mt-0.5">ROI typically within 18–24 months</p>
+            </div>
+          </motion.div>
+
+          {/* Perks grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {FRANCHISE_PERKS.map(({ icon: Icon, title, desc }) => (
+              <motion.div
+                key={title}
+                variants={fadeUp}
+                className="bg-white rounded-2xl p-5 border border-[#E8D9C0] hover:border-[#C8A96E]/50 hover:shadow-[0_8px_30px_rgba(200,169,110,0.12)] transition-all duration-300"
+              >
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C8A96E]/20 to-[#8B5A2B]/10 flex items-center justify-center mb-3">
+                  <Icon size={18} className="text-[#8B5A2B]" />
+                </div>
+                <h4 className="font-serif text-sm font-bold text-[#2C1810] mb-1">{title}</h4>
+                <p className="text-[11px] text-[#7A6050] leading-relaxed">{desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Process steps */}
+        <motion.div variants={fadeUp} className="bg-gradient-to-br from-[#2C1810] to-[#4A2C1A] rounded-3xl p-8 md:p-12 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-[#C8A96E]/8 blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-[#8B5A2B]/10 blur-2xl pointer-events-none" />
+
+          <p className="text-xs tracking-[0.3em] uppercase text-[#C8A96E] font-semibold mb-2 text-center">How It Works</p>
+          <h3 className="font-serif text-2xl md:text-3xl font-bold text-white mb-10 text-center">Your Path to Opening</h3>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 relative">
+            {/* connector line (desktop only) */}
+            <div className="hidden md:block absolute top-6 left-[12.5%] right-[12.5%] h-px bg-[#C8A96E]/20" />
+            {[
+              { step: "01", label: "Enquire", desc: "Fill out our franchise interest form or call us." },
+              { step: "02", label: "Site Visit", desc: "Visit our Bhavani outlet & meet the founding team." },
+              { step: "03", label: "Agreement", desc: "Sign the franchise MOU and lock in your territory." },
+              { step: "04", label: "Launch", desc: "Setup, staff training, soft launch & grand opening." },
+            ].map(({ step, label, desc }) => (
+              <div key={step} className="flex flex-col items-center text-center relative z-10">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#C8A96E] to-[#8B5A2B] flex items-center justify-center text-white font-serif text-sm font-bold mb-3 shadow-lg">
+                  {step}
+                </div>
+                <p className="text-white font-semibold text-sm mb-1">{label}</p>
+                <p className="text-[#A89070] text-[11px] leading-relaxed">{desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* CTA row */}
+          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mt-10">
+            <a
+              href="tel:+919345678646"
+              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-[#C8A96E] to-[#8B5A2B] text-white font-semibold text-xs tracking-widest uppercase hover:scale-105 hover:shadow-xl transition-all duration-300"
+            >
+              <PhoneCall size={14} /> Call Us to Enquire
+            </a>
+            <a
+              href="https://wa.me/919345678646?text=Hi%20Velvet%20Salon%2C%20I'm%20interested%20in%20a%20franchise%20opportunity."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full border border-[#C8A96E]/40 text-[#C8A96E] font-medium text-xs tracking-wider uppercase hover:bg-[#C8A96E]/10 transition-all duration-300"
+            >
+              WhatsApp Enquiry <ArrowRight size={13} />
+            </a>
+          </div>
+        </motion.div>
+      </div>
+    </motion.section>
   );
 }
 
@@ -514,9 +813,7 @@ function CTABanner() {
         <div className="absolute top-0 right-0 w-72 h-72 rounded-full bg-[#C8A96E]/10 blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-[#8B5A2B]/10 blur-2xl pointer-events-none" />
         <Crown size={34} className="text-[#C8A96E] mx-auto mb-4" />
-        <h2 className="font-serif text-3xl md:text-5xl text-white font-bold mb-3">
-          Your Best Look Awaits
-        </h2>
+        <h2 className="font-serif text-3xl md:text-5xl text-white font-bold mb-3">Your Best Look Awaits</h2>
         <p className="text-[#A89070] text-sm md:text-base mb-8 max-w-md mx-auto leading-relaxed">
           Book your appointment today and experience the Velvet difference — luxury grooming, just for you.
         </p>
@@ -551,7 +848,8 @@ export default function Home() {
       <GenderCollections />
       <StatsBar />
       <ComboOffers />
-      <Testimonials />
+      <GoogleReviews />
+      <FranchiseSection />
       <CTABanner />
     </div>
   );

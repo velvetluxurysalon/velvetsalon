@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import {
   MapPin,
   Phone,
@@ -11,6 +12,7 @@ import {
   MessageCircle,
   Calendar,
   Scissors,
+  Cake,
 } from "lucide-react";
 
 const info = [
@@ -27,6 +29,18 @@ const info = [
     href: "mailto:Velvetluxurysalon@gmail.com",
   },
   {
+    icon: Mail,
+    label: "Support",
+    value: "support@velvet.in",
+    href: "mailto:support@velvet.in",
+  },
+  {
+    icon: Mail,
+    label: "franchise",
+    value: "franchise@velvet.in",
+    href: "mailto:franchise@velvet.in",
+  },
+  {
     icon: MessageCircle,
     label: "WhatsApp",
     value: "9345678646",
@@ -36,7 +50,7 @@ const info = [
     icon: MapPin,
     label: "Visit Us",
     value: "Opposite to ICICI bank, KK Nagar, Kalingarayanpalayam, Bhavani Erode Dt, Tamil Nadu",
-    href: "https://maps.google.com/?q=KK+Nagar+Kalingarayanpalayam+Bhavani+Erode",
+    href: "https://g.page/r/CWB5ZgKh5KkEEBM/review",
   },
   {
     icon: Clock,
@@ -193,16 +207,46 @@ const SERVICE_GROUPS = [
 ];
 
 export default function Contact() {
+  const location = useLocation();
+  const formRef = useRef(null);
+
   const [form, setForm] = useState({
     name: "",
     email: "",
     phone: "",
+    dob: "",
     service: "",
     date: "",
     time: "",
     message: "",
   });
   const [sent, setSent] = useState(false);
+  const [bookedFromServices, setBookedFromServices] = useState(false);
+
+  // Flatten all known service option labels so we can check whether the
+  // incoming service (from the Services page) already exists in our list.
+  const allKnownServices = useMemo(
+    () => new Set(SERVICE_GROUPS.flatMap((g) => g.options)),
+    []
+  );
+
+  // Pre-fill the service field when arriving from a "Book Now" button on
+  // the Services page. Everything else (name, phone, date, etc.) is left
+  // blank for the guest to fill in manually.
+  useEffect(() => {
+    const incomingService = location.state?.service;
+    if (incomingService) {
+      setForm((prev) => ({ ...prev, service: incomingService }));
+      setBookedFromServices(true);
+
+      // Scroll the booking form into view so the guest immediately sees
+      // their pre-filled selection.
+      setTimeout(() => {
+        formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 150);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state]);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -227,6 +271,14 @@ export default function Contact() {
         })
       : "Not specified";
 
+    const formattedDob = form.dob
+      ? new Date(form.dob + "T00:00:00").toLocaleDateString("en-IN", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        })
+      : null;
+
     const lines = [
       "Hello Velvet Luxury Salon! ✨",
       "I'd like to book an appointment with the following details:",
@@ -236,6 +288,7 @@ export default function Contact() {
     ];
 
     if (form.email) lines.push(`*Email:* ${form.email}`);
+    if (formattedDob) lines.push(`*Date of Birth:* ${formattedDob}`);
 
     lines.push(
       `*Service:* ${form.service || "Not specified"}`,
@@ -253,6 +306,7 @@ export default function Contact() {
   };
 
   const today = new Date().toISOString().split("T")[0];
+  const serviceIsKnown = !form.service || allKnownServices.has(form.service);
 
   return (
     <div className="min-h-screen bg-[#FAF7F2] pt-20">
@@ -312,17 +366,21 @@ export default function Contact() {
                 </div>
               );
 
-              return href ? (
-                <a
-                  key={label}
-                  href={href}
-                  target={href.startsWith("http") ? "_blank" : undefined}
-                  rel="noopener noreferrer"
-                  className="block rounded-2xl hover:bg-[#C8A96E]/10 transition-colors duration-200 p-2 -mx-2"
-                >
-                  {inner}
-                </a>
-              ) : (
+              if (href) {
+                return (
+                  <a
+                    key={label}
+                    href={href}
+                    target={href.startsWith("http") ? "_blank" : undefined}
+                    rel="noopener noreferrer"
+                    className="block rounded-2xl hover:bg-[#C8A96E]/10 transition-colors duration-200 p-2 -mx-2"
+                  >
+                    {inner}
+                  </a>
+                );
+              }
+
+              return (
                 <div key={label} className="p-2 -mx-2">
                   {inner}
                 </div>
@@ -333,6 +391,7 @@ export default function Contact() {
 
         {/* Form */}
         <motion.div
+          ref={formRef}
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.7, delay: 0.1 }}
@@ -354,7 +413,17 @@ export default function Contact() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
-              <h3 className="font-serif text-2xl font-bold text-[#2C1810] mb-6">Book an Appointment</h3>
+              <h3 className="font-serif text-2xl font-bold text-[#2C1810] mb-2">Book an Appointment</h3>
+
+              {bookedFromServices && form.service && (
+                <div className="flex items-center gap-2 bg-[#F5EFE6] border border-[#C8A96E]/40 rounded-xl px-4 py-2.5 mb-4">
+                  <Scissors size={13} className="text-[#C8A96E] shrink-0" />
+                  <p className="text-xs text-[#5A4535]">
+                    Booking for <span className="font-semibold text-[#8B5A2B]">{form.service}</span> — just fill in
+                    your details below.
+                  </p>
+                </div>
+              )}
 
               {/* Name */}
               <div>
@@ -403,6 +472,23 @@ export default function Contact() {
                 </div>
               </div>
 
+              {/* Date of Birth */}
+              <div>
+                <label className="text-xs tracking-wider uppercase text-[#8B5A2B] font-semibold block mb-2 flex items-center gap-2">
+                  <Cake size={13} className="text-[#C8A96E]" />
+                  Date of Birth
+                </label>
+                <input
+                  type="date"
+                  name="dob"
+                  value={form.dob}
+                  onChange={handleChange}
+                  max={today}
+                  className="w-full bg-[#FAF7F2] border border-[#E8D9C0] rounded-xl px-4 py-3 text-sm text-[#2C1810] focus:outline-none focus:border-[#C8A96E] focus:ring-2 focus:ring-[#C8A96E]/10 transition-all"
+                  required
+                />
+              </div>
+
               {/* Service */}
               <div>
                 <label className="text-xs tracking-wider uppercase text-[#8B5A2B] font-semibold block mb-2 flex items-center gap-2">
@@ -419,6 +505,17 @@ export default function Contact() {
                   <option value="" disabled>
                     Choose a service...
                   </option>
+
+                  {/* If the service came from the Services page but isn't an
+                      exact match in the list below (naming drift, new combo,
+                      etc.) inject it here so the dropdown always shows the
+                      correct selection. */}
+                  {!serviceIsKnown && (
+                    <optgroup label="Selected Service">
+                      <option value={form.service}>{form.service}</option>
+                    </optgroup>
+                  )}
+
                   {SERVICE_GROUPS.map((group) => (
                     <optgroup key={group.label} label={group.label}>
                       {group.options.map((opt) => (
