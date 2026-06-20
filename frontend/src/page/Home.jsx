@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useInView } from "react-intersection-observer";
 import { useEffect, useState, useRef } from "react";
 import {
@@ -150,30 +150,6 @@ const stats = [
 
 // Real reviews from Google listing (Bhavani, 4.7★)
 const GOOGLE_REVIEWS = [
-  {
-    name: "Priya Nair",
-    initial: "P",
-    rating: 5,
-    date: "2 weeks ago",
-    text: "Best salon in Bhavani! My keratin treatment was absolutely flawless and the staff was so attentive. Have been coming here for 2 years and never disappointed.",
-    color: "from-[#C8A96E] to-[#8B5A2B]",
-  },
-  {
-    name: "Arjun Mehta",
-    initial: "A",
-    rating: 5,
-    date: "1 month ago",
-    text: "The beard sculpting and skin ritual combo is unreal. Clean setup, skilled stylists and great pricing. I look 10 years younger after every visit. Highly recommended!",
-    color: "from-[#8B5A2B] to-[#5C3010]",
-  },
-  {
-    name: "Sneha Kapoor",
-    initial: "S",
-    rating: 5,
-    date: "3 weeks ago",
-    text: "My bridal package was absolutely dreamy. Every detail from hair to nails was perfection. The team made me feel so special on my big day. Worth every rupee!",
-    color: "from-[#C8A96E] to-[#A07840]",
-  },
   {
     name: "Kavitha R",
     initial: "K",
@@ -348,12 +324,19 @@ function HeroCarousel() {
 // ─────────────────────────────────────────────────────────────────────────────
 function CategoryTabs() {
   const [active, setActive] = useState(0);
+  const navigate = useNavigate();
+
+  const handleSelect = (i) => {
+    setActive(i);
+    navigate("/services");
+  };
+
   return (
     <section className="bg-[#FAF7F2] pt-6 pb-3 px-4 border-b border-[#E8D9C0]">
       <div className="max-w-5xl mx-auto">
         <div className="flex gap-5 overflow-x-auto no-scrollbar pb-1 justify-start md:justify-center">
           {CATEGORY_TABS.map(({ label, img }, i) => (
-            <button key={label} onClick={() => setActive(i)} className="flex flex-col items-center gap-1.5 flex-shrink-0 group">
+            <button key={label} onClick={() => handleSelect(i)} className="flex flex-col items-center gap-1.5 flex-shrink-0 group">
               <div className={`w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border-2 transition-all duration-300 ${
                 i === active ? "border-[#C8A96E] shadow-[0_0_0_3px_rgba(200,169,110,0.22)]" : "border-[#E8D9C0] group-hover:border-[#C8A96E]/50"
               }`}>
@@ -844,8 +827,8 @@ export default function Home() {
     <div className="bg-[#FAF7F2] min-h-screen pt-16 md:pt-20">
       <HeroCarousel />
       <CategoryTabs />
-      <ServicesPreview />
       <GenderCollections />
+      <ServicesPreview />
       <StatsBar />
       <ComboOffers />
       <GoogleReviews />

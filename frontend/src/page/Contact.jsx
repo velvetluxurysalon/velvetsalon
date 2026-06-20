@@ -31,14 +31,14 @@ const info = [
   {
     icon: Mail,
     label: "Support",
-    value: "support@velvet.in",
-    href: "mailto:support@velvet.in",
+    value: "support@velvetluxurysalon.in",
+    href: "mailto:support@velvetluxurysalon.in",
   },
   {
     icon: Mail,
     label: "franchise",
-    value: "franchise@velvet.in",
-    href: "mailto:franchise@velvet.in",
+    value: "franchise@velvetluxurysalon.in",
+    href: "mailto:franchise@velvetluxurysalon.in",
   },
   {
     icon: MessageCircle,
